@@ -119,7 +119,7 @@ function HeadPainSelector({
 
   const isFrontView = viewAngle >= -35 && viewAngle <= 35
   const isLeftView = viewAngle < -35
-  const isRightView = viewAngle > 35
+  
 
   const selectedFill = 'rgba(20, 184, 166, 0.30)'
   const selectedStroke = '#0F766E'
