@@ -23,8 +23,11 @@ export function AuthScreen() {
       }
 
       const { error } = await supabase.auth.signInWithOtp({
-        email: trimmedEmail,
-      })
+  email: trimmedEmail,
+  options: {
+    emailRedirectTo: window.location.origin,
+  },
+})
 
       if (error) {
         throw error
