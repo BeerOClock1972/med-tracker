@@ -30,7 +30,7 @@ type SymptomJoinRow = {
   symptoms: {
     id: string
     label: string
-  } | null
+  }[] | null
 }
 
 type DailyRow = {
@@ -179,7 +179,8 @@ export function InsightsPage() {
             .in('entry_id', entryIds)
 
           if (symptomsError) throw symptomsError
-          symptomData = (joinedSymptoms as SymptomJoinRow[]) ?? []
+
+          symptomData = (joinedSymptoms ?? []) as unknown as SymptomJoinRow[]
         }
 
         setEntries((entriesData as HeadacheEntry[]) ?? [])
@@ -250,7 +251,7 @@ export function InsightsPage() {
     const counts: Record<string, number> = {}
 
     for (const row of symptomRows) {
-      const label = row.symptoms?.label ?? 'Unknown'
+      const label = row.symptoms?.[0]?.label ?? 'Unknown'
       counts[label] = (counts[label] ?? 0) + 1
     }
 
@@ -296,7 +297,10 @@ export function InsightsPage() {
   ]
 
   const barChartMinWidth = Math.max(dailyData.length * (isMobile ? 34 : 30), 280)
-  const lineChartMinWidth = Math.max(dailyData.length * (isMobile ? 34 : 30), 280)
+  const lineChartMinWidth = Math.max(
+    dailyData.length * (isMobile ? 34 : 30),
+    280
+  )
   const topSymptoms = symptomPieData.slice(0, 6)
 
   return (
@@ -545,9 +549,19 @@ export function InsightsPage() {
                       />
                       {!isMobile ? <Legend /> : null}
                       <Bar dataKey="mild" stackId="severity" fill="#22C55E" name="Mild" />
-                      <Bar dataKey="moderate" stackId="severity" fill="#EAB308" name="Moderate" />
+                      <Bar
+                        dataKey="moderate"
+                        stackId="severity"
+                        fill="#EAB308"
+                        name="Moderate"
+                      />
                       <Bar dataKey="severe" stackId="severity" fill="#F97316" name="Severe" />
-                      <Bar dataKey="verySevere" stackId="severity" fill="#DC2626" name="Very severe" />
+                      <Bar
+                        dataKey="verySevere"
+                        stackId="severity"
+                        fill="#DC2626"
+                        name="Very severe"
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -665,8 +679,7 @@ export function InsightsPage() {
                                 width: '10px',
                                 height: '10px',
                                 borderRadius: '999px',
-                                background:
-                                  pieColours[index % pieColours.length],
+                                background: pieColours[index % pieColours.length],
                                 flexShrink: 0,
                               }}
                             />
