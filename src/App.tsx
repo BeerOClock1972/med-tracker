@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react'
 import { AuthScreen } from './components/AuthScreen'
 import { LogHeadacheForm } from './components/LogHeadacheForm'
+import { InsightsPage } from './components/InsightsPage'
 import { supabase } from './lib/supabase'
 import logo from './assets/med-tracker-logo.png'
+
+type Tab = 'log' | 'insights'
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSignedIn, setIsSignedIn] = useState(false)
+  const [activeTab, setActiveTab] = useState<Tab>('log')
 
   useEffect(() => {
     let mounted = true
@@ -37,6 +41,28 @@ function App() {
       subscription.unsubscribe()
     }
   }, [])
+
+  async function handleSignOut() {
+    await supabase.auth.signOut()
+  }
+
+  function tabButtonStyle(tab: Tab) {
+    const isActive = activeTab === tab
+
+    return {
+      flex: '1 1 140px',
+      minWidth: 0,
+      border: 'none',
+      borderRadius: '999px',
+      padding: '12px 16px',
+      background: isActive ? '#14B8A6' : '#E2E8F0',
+      color: isActive ? '#FFFFFF' : '#0F172A',
+      fontSize: '14px',
+      fontWeight: 700,
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+    } as const
+  }
 
   if (isLoading) {
     return (
@@ -69,12 +95,16 @@ function App() {
         fontFamily:
           'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
         color: '#1A1A1A',
+        boxSizing: 'border-box',
       }}
     >
       <div
         style={{
+          width: '100%',
           maxWidth: '420px',
           margin: '0 auto',
+          minWidth: 0,
+          boxSizing: 'border-box',
         }}
       >
         <div
@@ -104,42 +134,115 @@ function App() {
             color: '#ffffff',
             boxShadow: '0 12px 30px rgba(30, 90, 150, 0.18)',
             marginBottom: '20px',
+            boxSizing: 'border-box',
           }}
         >
-          <p
+          <div
             style={{
-              margin: 0,
-              fontSize: '14px',
-              opacity: 0.9,
+              display: 'grid',
+              gap: '16px',
             }}
           >
-            Med Tracker
-          </p>
+            <div>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: '14px',
+                  opacity: 0.9,
+                }}
+              >
+                Med Tracker
+              </p>
 
-          <h1
-            style={{
-              margin: '8px 0 10px',
-              fontSize: '28px',
-              lineHeight: 1.1,
-            }}
-          >
-            Log a headache
-          </h1>
+              <h1
+                style={{
+                  margin: '8px 0 10px',
+                  fontSize: '28px',
+                  lineHeight: 1.1,
+                }}
+              >
+                {activeTab === 'log' ? 'Log a headache' : 'Insights'}
+              </h1>
 
-          <p
-            style={{
-              margin: 0,
-              fontSize: '15px',
-              lineHeight: 1.5,
-              opacity: 0.95,
-            }}
-          >
-            Record severity, symptoms, pain location, medication, and notes in
-            one place.
-          </p>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: '15px',
+                  lineHeight: 1.5,
+                  opacity: 0.95,
+                }}
+              >
+                {activeTab === 'log'
+                  ? 'Record severity, symptoms, pain location, medication, and notes in one place.'
+                  : 'See patterns in headaches, symptom trends, and severity over time.'}
+              </p>
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-start',
+              }}
+            >
+              <button
+                type="button"
+                onClick={handleSignOut}
+                style={{
+                  border: '1px solid rgba(255,255,255,0.28)',
+                  background: 'rgba(255,255,255,0.14)',
+                  color: '#FFFFFF',
+                  borderRadius: '12px',
+                  padding: '10px 14px',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
         </section>
 
-        <LogHeadacheForm />
+        <div
+          style={{
+            display: 'flex',
+            gap: '10px',
+            flexWrap: 'wrap',
+            background: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '20px',
+            padding: '10px',
+            marginBottom: '20px',
+            boxShadow: '0 10px 24px rgba(15, 23, 42, 0.06)',
+            boxSizing: 'border-box',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setActiveTab('log')}
+            style={tabButtonStyle('log')}
+          >
+            Log headache
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('insights')}
+            style={tabButtonStyle('insights')}
+          >
+            Insights
+          </button>
+        </div>
+
+        <div
+          style={{
+            width: '100%',
+            minWidth: 0,
+          }}
+        >
+          {activeTab === 'log' ? <LogHeadacheForm /> : <InsightsPage />}
+        </div>
       </div>
     </main>
   )
