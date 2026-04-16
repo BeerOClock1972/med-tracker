@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { AuthScreen } from './components/AuthScreen'
 import { LogHeadacheForm } from './components/LogHeadacheForm'
 import { InsightsPage } from './components/InsightsPage'
+import { HeadacheReport } from './components/HeadacheReport'
 import { supabase } from './lib/supabase'
 import logo from './assets/med-tracker-logo.png'
 
-type Tab = 'log' | 'insights'
+type Tab = 'log' | 'insights' | 'report'
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
@@ -161,7 +162,11 @@ function App() {
                   lineHeight: 1.1,
                 }}
               >
-                {activeTab === 'log' ? 'Log a headache' : 'Insights'}
+                {activeTab === 'log'
+                  ? 'Log a headache'
+                  : activeTab === 'insights'
+                  ? 'Insights'
+                  : 'Report'}
               </h1>
 
               <p
@@ -174,7 +179,9 @@ function App() {
               >
                 {activeTab === 'log'
                   ? 'Record severity, symptoms, pain location, medication, and notes in one place.'
-                  : 'See patterns in headaches, symptom trends, and severity over time.'}
+                  : activeTab === 'insights'
+                  ? 'See patterns in headaches, symptom trends, and severity over time.'
+                  : 'View a full history of headaches including symptoms and medication.'}
               </p>
             </div>
 
@@ -233,6 +240,14 @@ function App() {
           >
             Insights
           </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('report')}
+            style={tabButtonStyle('report')}
+          >
+            Report
+          </button>
         </div>
 
         <div
@@ -241,7 +256,9 @@ function App() {
             minWidth: 0,
           }}
         >
-          {activeTab === 'log' ? <LogHeadacheForm /> : <InsightsPage />}
+          {activeTab === 'log' && <LogHeadacheForm />}
+          {activeTab === 'insights' && <InsightsPage />}
+          {activeTab === 'report' && <HeadacheReport />}
         </div>
       </div>
     </main>
